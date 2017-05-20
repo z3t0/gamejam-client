@@ -1602,6 +1602,10 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.3.6"
 
+keyboardjs@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/keyboardjs/-/keyboardjs-2.3.3.tgz#57527a4905dce72dea838ef5d8b166bf9c99bd82"
+
 kind-of@^3.0.2:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-3.2.2.tgz#31ea21a734bab9bbb0f32466d893aea51e4a3c64"

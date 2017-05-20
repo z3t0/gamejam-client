@@ -27,23 +27,21 @@ class Player {
 
   // Updates on the local client
   update (deltaTime) {
-   //  if (deltaTime) {
-   //    var sprite = this.sprite
-   //    const speed = 0.05
-   //    deltaTime = deltaTime / 1000
-   //    console.log(deltaTime)
-   //    sprite.x += sprite.vx * this.speed * deltaTime
-   //    sprite.y += sprite.vy * this.speed * deltaTime
-   //  }
-   // console.log(this.sprite.y)
+    if (deltaTime) {
+      var sprite = this.sprite
+      const speed = 0.05
+      deltaTime = deltaTime / 1000
+      console.log(deltaTime)
+      sprite.x += sprite.vx * this.speed * deltaTime
+      sprite.y += sprite.vy * this.speed * deltaTime
+    }
+   console.log(this.sprite.y)
   }
 
   sync (data) {
+    debugger
     this.sprite.x = data.x
     this.sprite.y = data.y
-
-    this.sprite.vx = data.vx
-    this.sprite.vy = data.vy
   }
 
   setVelocityY (vy) {
@@ -74,6 +72,34 @@ class Player {
     info.color = this.color
 
     return info
+  }
+
+  pressed (movement) {
+    let info = this.getPlayerInfo()
+    let sprite = this.sprite
+
+    switch(movement) {
+    case 'up':
+      sprite.y -= this.speed
+      this.game.emit('up', info)
+      break
+
+    case 'right':
+      sprite.x += this.speed
+      this.game.emit('right', info)
+      break
+
+    case 'left':
+      sprite.x -= this.speed
+      this.game.emit('left', info)
+      break
+
+
+    case 'down':
+      sprite.y += this.speed
+      this.game.emit('down', info)
+      break
+    }
   }
 }
 

@@ -2,6 +2,7 @@
 var PIXI = require('pixi.js')
 var Player = require('./player.js')
 var timeframe= require('timeframe')
+let keyboardjs = require('keyboardjs')
 
 class Game {
   constructor () {
@@ -16,6 +17,31 @@ class Game {
     .load(() => {
       this.init()
     })
+
+    // Setup controls
+    keyboardjs.bind('a', () => {
+      this.input('left')
+    })
+
+    keyboardjs.bind('s', () => {
+      this.input('down')
+    })
+
+    keyboardjs.bind('d', () => {
+      this.input('right')
+    })
+
+    keyboardjs.bind('w', () => {
+      this.input('up')
+    })
+
+
+  }
+
+  input(press) {
+    if (this.me !== null) {
+      this.me.pressed(press)
+    }
   }
 
   loop (time) {
@@ -23,18 +49,12 @@ class Game {
       this.loop(time)
     })
 
-    // this.deltaTime = time - this.lastTime
-    // this.lastTime = time
-
-    // if (time != null) {
-    // }
-
     this.renderer.render(this.stage)
 
   }
 
   emit(msg, data) {
-    this.client.socket.emit(msg)
+    this.client.socket.emit(msg, data)
   }
 
   connect () {
@@ -56,7 +76,13 @@ class Game {
     })
 
     client.on('update', (data) => {
-      console.log('got update')
+      console.log('update')
+
+      debugger
+      for (let i = 0; i < data.length; i++) {
+        // debugger
+        // window.game.players[data[i].id].sync(data[i])
+      }
     })
   }
 

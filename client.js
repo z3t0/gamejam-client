@@ -27,7 +27,6 @@ function Client (opts) {
 
   socket.on('update', function (data) {
     emitter.emit('update', data)
-    console.log('upadte')
   })
 
   socket.on('disconnect', function (data) {
