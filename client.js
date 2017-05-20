@@ -25,6 +25,10 @@ function Client (opts) {
     emitter.emit('newPlayer', playerData)
   })
 
+  socket.on('disconnectPlayer', (id) => {
+    emitter.emit('disconnectPlayer', id)
+  })
+
   socket.on('update', (data) => {
     emitter.emit('update', data)
   })

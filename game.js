@@ -4,6 +4,8 @@ var Player = require('./player.js')
 let keyboardjs = require('keyboardjs')
 import Matter from 'matter-js'
 
+const PHYS_DEBUG = 0
+
 class Game {
   constructor (url) {
     this.url = url
@@ -24,11 +26,14 @@ class Game {
     // Physics
     this.engine = Matter.Engine.create()
     this.world = Matter.World
+    
 
-    // var render = Matter.Render.create({
-    //   element: document.body,
-    //   engine: this.engine
-    // });
+    if (PHYS_DEBUG) {
+      var render = Matter.Render.create({
+        element: document.body,
+        engine: this.engine
+      });
+    }
 
     this.engine.world.gravity.y = 0
 
@@ -36,7 +41,8 @@ class Game {
     Matter.Engine.run(this.engine)
 
     // run the renderer
-    // Matter.Render.run(render)
+    if (PHYS_DEBUG)
+      Matter.Render.run(render)
 
     // Setup controls
     keyboardjs.bind('a', () => {
@@ -85,6 +91,7 @@ class Game {
 
     this.deltaTime = time - this.lastTime
     this.lastTime = time
+
     // console.log(`Delta time : ${this.deltaTime}`)
     // console.log(`Last time : ${this.lastTime}`)
     // console.log(`time : ${time}`)
@@ -111,9 +118,16 @@ class Game {
 
     client.on('newPlayer', this.gotNewPlayer.bind(this))
 
+    client.on('disconnectPlayer', this.gotDisconnectPlayer.bind(this))
+
     client.on('connect', this.gotConnect.bind(this))
 
     client.on('update', this.gotUpdate.bind(this))
+  }
+
+  gotDisconnectPlayer (id) {
+    delete this.players[id]
+    console.log(`disconnected player : ${id}`)
   }
 
   gotConnect (data) {
@@ -150,7 +164,8 @@ class Game {
     var renderer = PIXI.autoDetectRenderer(256, 256)
 
     // Add the canvas to the HTML document
-    document.getElementById('game').appendChild(renderer.view)
+    if (!PHYS_DEBUG)
+      document.getElementById('game').appendChild(renderer.view)
 
     // Autoresize
     renderer.view.style.position = 'absolute'

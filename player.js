@@ -23,9 +23,8 @@ class Player {
     this.sprite.tint = data.color
 
     game.stage.addChild(this.sprite)
-    this.sprite.x = 10
-    this.sprite.y = 10
 
+    this.sprite.pivot.set(this.sprite.width/2, this.sprite.height/2)
     this.game = game
     console.log('player created')
 
@@ -38,10 +37,9 @@ class Player {
 
     // physics
     this.physics = {}
-    this.physics.body = Matter.Bodies.rectangle(data.x, data.y, 100, 100)
+    this.physics.body = Matter.Bodies.rectangle(data.x, data.y, this.sprite.width, this.sprite.height)
     this.game.world.add(this.game.engine.world, this.physics.body)
     // Matter.Body.applyForce(this.body, Matter.Vector.create(-100,100), Matter.Vector.create(1, -1))
-    Matter.Body.setVelocity(this.physics.body, Matter.Vector.create(2, 0))
   }
 
   // Updates on the local client
@@ -51,40 +49,13 @@ class Player {
 
     sprite.x = pos.x
     sprite.y = pos.y
-    // let {left, right, up, down} = this.keys
 
-    // if (deltaTime) {
-    //   var sprite = this.sprite
-    //   deltaTime = deltaTime / 1000
-    //   if (left) {
-    //     this.turnAntiClockwise(deltaTime)
-    //   }
-
-    //   else if (right) {
-    //     this.turnClockwise(deltaTime)
-    //   }
-
-    //   sprite.x += this.speed * deltaTime
-
-    //   console.log(this.heading)
-    //   sprite.x += this.speed * math.cos(this.heading) * deltaTime
-    //   sprite.y += this.speed * math.sin(this.heading) * deltaTime
-    // }
+    sprite.rotation = this.physics.body.angle
   }
 
   sync (data) {
     // this.sprite.x = data.x
     // this.sprite.y = data.y
-  }
-
-  turnAntiClockwise (deltaTime) {
-    this.heading -= this.turnSpeed * deltaTime
-    this.sprite.rotation = this.heading
-  }
-
-  turnClockwise (deltaTime) {
-    this.heading += this.turnSpeed * deltaTime
-    this.sprite.rotation = this.heading
   }
 
   getPlayerInfo () {
@@ -111,48 +82,66 @@ class Player {
     let info = this.getPlayerInfo()
     let sprite = this.sprite
     let keys = this.keys
+    let speed = 2
 
     switch(movement) {
     case 'up':
       keys.up = true
       keys.down = false
+      var x = speed * math.cos(this.physics.body.angle)
+      var y = speed * math.sin(this.physics.body.angle)
+      Matter.Body.setVelocity(this.physics.body, Matter.Vector.create(x, y))
       // this.game.emit('up', info)
       break
 
     case 'up-release':
       keys.up = false
+      Matter.Body.setVelocity(this.physics.body, Matter.Vector.create(0, 0))
+      this.game.emit('up-release', info)
       break
 
     case 'right':
       keys.left = false
       keys.right = true
-      // this.game.emit('right', info)
+      Matter.Body.setAngularVelocity(this.physics.body, this.turnSpeed)
+      Matter.Body.setVelocity(this.physics.body, Matter.Vector.create(0, 0))
+      this.game.emit('right', info)
       break
 
     case 'right-release':
       keys.right = false
+      Matter.Body.setAngularVelocity(this.physics.body, 0)
+      this.game.emit('right-release', info)
       break
 
     case 'left':
       keys.left = true
       keys.right = false
-      // sprite.x -= this.speed
+      Matter.Body.setVelocity(this.physics.body, Matter.Vector.create(0, 0))
+      Matter.Body.setAngularVelocity(this.physics.body, -this.turnSpeed)
       this.game.emit('left', info)
       break
 
     case 'left-release':
-      keys.left= false
+      Matter.Body.setAngularVelocity(this.physics.body, 0)
+      keys.left = false
+      this.game.emit('left-release', info)
       break
 
     case 'down':
+      Matter.Body.setVelocity(this.physics.body, Matter.Vector.create(-2, 0))
       keys.down = true
       keys.up = false
-      // sprite.y += this.speed
+      let dx = speed * math.cos(this.physics.body.angle)
+      let dy = speed * math.sin(this.physics.body.angle)
+      Matter.Body.setVelocity(this.physics.body, Matter.Vector.create(-dx, -dy))
       this.game.emit('down', info)
       break
 
     case 'down-release':
+      Matter.Body.setVelocity(this.physics.body, Matter.Vector.create(0, 0))
       keys.down = false
+      this.game.emit('down-release', info)
       break
     }
   }
