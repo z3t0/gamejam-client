@@ -15,11 +15,14 @@ class Player {
     this.sprite.scale.y = data.sizeY
     this.sprite.vx = data.vx
     this.sprite.vy = data.vy
-    this.sprite.tint = data.color
+    // this.sprite.tint = data.color
 
     game.stage.addChild(this.sprite)
+    this.sprite.x = 10
+    this.sprite.y = 10
 
     this.game = game
+    console.log('player created')
   }
 
   // Updates on the local client

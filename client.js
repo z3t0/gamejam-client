@@ -21,14 +21,17 @@ function Client (opts) {
 
   socket.on('new_player', function (playerData) {
     playerData.isMe = false
+    console.log('new player')
     emitter.emit('new_player', playerData)
   })
 
   socket.on('update', function (data) {
     emitter.emit('update', data)
+    console.log('upadte')
   })
 
   socket.on('disconnect', function (data) {
+    console.log('disconnect')
     emitter.emit('disconnect', data)
   })
 

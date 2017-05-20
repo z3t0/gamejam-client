@@ -29,12 +29,12 @@ class Game {
     // if (time != null) {
     // }
 
-    console.log('loop')
+    this.renderer.render(this.stage)
+
   }
 
   emit(msg, data) {
-    // this.me.
-    this.client.socket.emit(msg, this.timeline.offset(0))
+    this.client.socket.emit(msg)
   }
 
   connect () {
@@ -49,13 +49,14 @@ class Game {
     })
 
     client.on('connect', (data) => {
+      console.log('connect')
       this.me = new Player(data, this)
       this.players[this.me.id] = this.me
       this.loop()
     })
 
     client.on('update', (data) => {
-
+      console.log('got update')
     })
   }
 
