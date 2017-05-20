@@ -1,11 +1,12 @@
 // client - game.js
 var PIXI = require('pixi.js')
 var Player = require('./player.js')
-var timeframe= require('timeframe')
 let keyboardjs = require('keyboardjs')
 
 class Game {
-  constructor () {
+  constructor (url) {
+    this.url = url
+
     this.players = {}
     this.world = null
 
@@ -28,17 +29,16 @@ class Game {
     })
 
     keyboardjs.bind('d', () => {
+      console.log('d')
       this.input('right')
     })
 
     keyboardjs.bind('w', () => {
       this.input('up')
     })
-
-
   }
 
-  input(press) {
+  input (press) {
     if (this.me !== null) {
       this.me.pressed(press)
     }
@@ -50,40 +50,41 @@ class Game {
     })
 
     this.renderer.render(this.stage)
-
   }
 
-  emit(msg, data) {
+  emit (msg, data) {
     this.client.socket.emit(msg, data)
   }
 
   connect () {
-    this.client = require('./client.js')({path: '10.227.130.122:3000'}, this)
+    this.client = require('./client.js')({path: this.url}, this)
 
     var client = this.client.emitter
 
-    client.on('new_player', (data) => {
-      console.log('new player')
-      var newPlayer = new Player(data, this)
-      this.players[newPlayer.id] = newPlayer
-    })
+    client.on('new_player', this.gotNewPlayer.bind(this))
 
-    client.on('connect', (data) => {
-      console.log('connect')
-      this.me = new Player(data, this)
-      this.players[this.me.id] = this.me
-      this.loop()
-    })
+    client.on('connect', this.gotConnect.bind(this))
 
-    client.on('update', (data) => {
-      console.log('update')
+    client.on('update', this.gotUpdate.bind(this))
+  }
 
-      debugger
-      for (let i = 0; i < data.length; i++) {
-        // debugger
-        // window.game.players[data[i].id].sync(data[i])
-      }
-    })
+  gotConnect (data) {
+    console.log('connect')
+    this.me = new Player(data, this)
+    this.players[this.me.id] = this.me
+    this.loop()
+  }
+
+  gotNewPlayer (data) {
+    console.log('new player')
+    var newPlayer = new Player(data, this)
+    this.players[newPlayer.id] = newPlayer
+  }
+
+  gotUpdate (data) {
+    for (let i = 0; i < data.length; i++) {
+      this.players[data[i].id].sync(data[i])
+    }
   }
 
   log (msg) {
@@ -115,7 +116,6 @@ class Game {
     this.renderer = renderer
     this.stage = stage
     this.pixi = PIXI
-
     this.connect()
   }
 }
@@ -130,43 +130,6 @@ function loadProgressHandler (loader, resource) {
   // If you gave your files names as the first argument
   // of the `add` method, you can access them like this
   // console.log("loading: " + resource.name);
-}
-
-function keyboard (keyCode) {
-  var key = {}
-  key.code = keyCode
-  key.isDown = false
-  key.isUp = true
-  key.press = undefined
-  key.release = undefined
-  // The `downHandler`
-  key.downHandler = function (event) {
-    if (event.keyCode === key.code) {
-      if (key.isUp && key.press) key.press()
-      key.isDown = true
-      key.isUp = false
-    }
-    event.preventDefault()
-  }
-
-  // The `upHandler`
-  key.upHandler = function (event) {
-    if (event.keyCode === key.code) {
-      if (key.isDown && key.release) key.release()
-      key.isDown = false
-      key.isUp = true
-    }
-    event.preventDefault()
-  }
-
-  // Attach event listeners
-  window.addEventListener(
-    'keydown', key.downHandler.bind(key), false
-    )
-  window.addEventListener(
-    'keyup', key.upHandler.bind(key), false
-    )
-  return key
 }
 
 module.exports = Game

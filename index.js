@@ -4,5 +4,5 @@
 import Game from './game.js'
 
 window.onload = function () {
-  window.game = new Game()
+  window.game = new Game('localhost:3000')
 }

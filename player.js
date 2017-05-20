@@ -39,7 +39,6 @@ class Player {
   }
 
   sync (data) {
-    debugger
     this.sprite.x = data.x
     this.sprite.y = data.y
   }
@@ -87,6 +86,7 @@ class Player {
     case 'right':
       sprite.x += this.speed
       this.game.emit('right', info)
+      console.log('right')
       break
 
     case 'left':

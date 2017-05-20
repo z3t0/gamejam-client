@@ -25,7 +25,7 @@ function Client (opts) {
     emitter.emit('new_player', playerData)
   })
 
-  socket.on('update', function (data) {
+  socket.on('update', (data) => {
     emitter.emit('update', data)
   })
 
