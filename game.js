@@ -4,6 +4,10 @@ var Player = require('./player.js')
 let keyboardjs = require('keyboardjs')
 import Matter from 'matter-js'
 
+
+var howler = require('howler')
+
+
 const PHYS_DEBUG = 0
 
 class Game {
@@ -11,6 +15,7 @@ class Game {
     this.url = url
 
     this.players = {}
+    this.bullets = []
     this.world = null
 
     this.me = null
@@ -18,6 +23,8 @@ class Game {
     PIXI.loader
       .add('circle', 'res/img/circle.png')
       .add('tank1', '/res/img/tank1.png')
+      .add('bullet','/res/img/bullet.png')
+      .add('background','/res/img/texture.png')
       .on('progress', loadProgressHandler)
       .load(() => {
         this.init()
@@ -26,11 +33,11 @@ class Game {
     // Physics
     this.engine = Matter.Engine.create()
     this.world = Matter.World
-    
+    var p = document.getElementById('physics')
 
     if (PHYS_DEBUG) {
       var render = Matter.Render.create({
-        element: document.body,
+        element: p,
         engine: this.engine
       });
     }
@@ -43,6 +50,7 @@ class Game {
     // run the renderer
     if (PHYS_DEBUG)
       Matter.Render.run(render)
+
 
     // Setup controls
     keyboardjs.bind('a', () => {
@@ -76,6 +84,19 @@ class Game {
     keyboardjs.bind('w', null, () => {
       this.input('up-release')
     })
+
+    keyboardjs.bind("space",()=>{
+      this.input('shoot')
+    })
+
+    this.sounds = {}
+    // this.sounds.background = new Howl({
+    //  src: ['res/sound/backgroundmusic.mp3'],
+    //loop: true,
+    // })
+
+    // this.sounds.background.play()
+
   }
 
   input (press) {
@@ -83,6 +104,7 @@ class Game {
       this.me.pressed(press)
     }
   }
+
 
   loop (time) {
     window.requestAnimationFrame((time) => {
@@ -96,11 +118,22 @@ class Game {
     // console.log(`Last time : ${this.lastTime}`)
     // console.log(`time : ${time}`)
 
+    console.log('loop')
+
     if (this.deltaTime) {
       // Matter.Engine.update(this.engine, this.deltaTime)
       for (var id in this.players) {
         this.players[id].update()
       }
+
+      this.bullets.forEach((bullet) => {
+        // debugger
+        let p = bullet.physics.body.position
+        console.log(`bullet pos in up: ${bullet.render.position.x} ${bullet.render.position.y} ${p.x} ${p.y}`)
+        bullet.render.position.x = bullet.physics.body.position.x
+        bullet.render.position.y = bullet.physics.body.position.y
+        bullet.render.rotation = bullet.physics.body.angle
+      })
     }
 
 
@@ -123,9 +156,16 @@ class Game {
     client.on('connect', this.gotConnect.bind(this))
 
     client.on('update', this.gotUpdate.bind(this))
+
+    client.on('shoot', this.gotShoot.bind(this))
+  }
+
+  gotShoot(data) {
+    this.players[data.id].shoot()
   }
 
   gotDisconnectPlayer (id) {
+    this.stage.removeChild(this.players[id].sprite)
     delete this.players[id]
     console.log(`disconnected player : ${id}`)
   }
@@ -164,7 +204,7 @@ class Game {
     var renderer = PIXI.autoDetectRenderer(256, 256)
 
     // Add the canvas to the HTML document
-    if (!PHYS_DEBUG)
+    // if (!PHYS_DEBUG)
       document.getElementById('game').appendChild(renderer.view)
 
     // Autoresize
@@ -180,6 +220,8 @@ class Game {
     this.stage = stage
     this.pixi = PIXI
     this.connect()
+    var background =  new PIXI.Sprite(PIXI.loader.resources.background.texture)
+    stage.addChild(background)
   }
 }
 
@@ -196,3 +238,5 @@ function loadProgressHandler (loader, resource) {
 }
 
 module.exports = Game
+
+

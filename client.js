@@ -19,6 +19,7 @@ function Client (opts) {
     emitter.emit('connect', playerData)
   })
 
+
   socket.on('newPlayer', function (playerData) {
     playerData.isMe = false
     console.log('new player')
@@ -31,6 +32,11 @@ function Client (opts) {
 
   socket.on('update', (data) => {
     emitter.emit('update', data)
+  })
+
+  socket.on('shoot', (data) => {
+    console.log('shooting network received')
+    emitter.emit('shoot', data)
   })
 
   socket.on('disconnect', function (data) {
