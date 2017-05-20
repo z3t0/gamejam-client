@@ -2,6 +2,7 @@
 var PIXI = require('pixi.js')
 var Player = require('./player.js')
 let keyboardjs = require('keyboardjs')
+import Matter from 'matter-js'
 
 class Game {
   constructor (url) {
@@ -13,11 +14,29 @@ class Game {
     this.me = null
     // Load Resources
     PIXI.loader
-    .add('circle', 'res/img/circle.png')
-    .on('progress', loadProgressHandler)
-    .load(() => {
-      this.init()
-    })
+      .add('circle', 'res/img/circle.png')
+      .add('tank1', '/res/img/tank1.png')
+      .on('progress', loadProgressHandler)
+      .load(() => {
+        this.init()
+      })
+
+    // Physics
+    this.engine = Matter.Engine.create()
+    this.world = Matter.World
+
+    // var render = Matter.Render.create({
+    //   element: document.body,
+    //   engine: this.engine
+    // });
+
+    this.engine.world.gravity.y = 0
+
+    // run the engine
+    Matter.Engine.run(this.engine)
+
+    // run the renderer
+    // Matter.Render.run(render)
 
     // Setup controls
     keyboardjs.bind('a', () => {
@@ -71,10 +90,12 @@ class Game {
     // console.log(`time : ${time}`)
 
     if (this.deltaTime) {
+      // Matter.Engine.update(this.engine, this.deltaTime)
       for (var id in this.players) {
-        this.players[id].update(this.deltaTime)
+        this.players[id].update()
       }
     }
+
 
     this.renderer.render(this.stage)
   }
@@ -125,19 +146,19 @@ class Game {
   }
 
   init () {
-  // Create the renderer
+    // Create the renderer
     var renderer = PIXI.autoDetectRenderer(256, 256)
 
-  // Add the canvas to the HTML document
+    // Add the canvas to the HTML document
     document.getElementById('game').appendChild(renderer.view)
 
-  // Autoresize
+    // Autoresize
     renderer.view.style.position = 'absolute'
     renderer.view.style.display = 'block'
     renderer.autoResize = true
     renderer.resize(window.innerWidth, window.innerHeight)
 
-  // Create a container object called the `stage`
+    // Create a container object called the `stage`
     var stage = new PIXI.Container()
 
     this.renderer = renderer

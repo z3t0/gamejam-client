@@ -1,5 +1,6 @@
 var PIXI = require('pixi.js')
 import math from 'math.js'
+import Matter from 'matter-js'
 
 class Player {
   constructor (data, game) {
@@ -10,14 +11,14 @@ class Player {
     this.turnSpeed = data.turnSpeed
     this.color = data.color
 
-    this.sprite = new PIXI.Sprite(PIXI.loader.resources.circle.texture)
+    this.sprite = new PIXI.Sprite(PIXI.loader.resources.tank1.texture)
     this.sprite.x = data.x
     this.sprite.x = data.y
     this.sprite.scale.x = data.sizeX
     this.sprite.scale.y = data.sizeY
     this.sprite.vx = data.vx
     this.sprite.vy = data.vy
-    // this.sprite.rotation = data.heading
+    this.sprite.rotation = data.heading
     this.heading = data.heading
     this.sprite.tint = data.color
 
@@ -34,26 +35,41 @@ class Player {
     this.keys.left = false
     this.keys.up = false
     this.keys.down = false
+
+    // physics
+    this.physics = {}
+    this.physics.body = Matter.Bodies.rectangle(data.x, data.y, 100, 100)
+    this.game.world.add(this.game.engine.world, this.physics.body)
+    // Matter.Body.applyForce(this.body, Matter.Vector.create(-100,100), Matter.Vector.create(1, -1))
+    Matter.Body.setVelocity(this.physics.body, Matter.Vector.create(2, 0))
   }
 
   // Updates on the local client
   update (deltaTime) {
-    let {left, right, up, down} = this.keys
+    let sprite = this.sprite
+    let pos = this.physics.body.position
 
-    if (deltaTime) {
-      var sprite = this.sprite
-      deltaTime = deltaTime / 1000
-      if (left) {
-        this.turnAntiClockwise(deltaTime)
-      }
+    sprite.x = pos.x
+    sprite.y = pos.y
+    // let {left, right, up, down} = this.keys
 
-      else if (right) {
-        this.turnClockwise(deltaTime)
-      }
+    // if (deltaTime) {
+    //   var sprite = this.sprite
+    //   deltaTime = deltaTime / 1000
+    //   if (left) {
+    //     this.turnAntiClockwise(deltaTime)
+    //   }
 
-      sprite.x += this.speed * math.cos(this.heading) * deltaTime
-      sprite.y += this.speed * math.sin(this.heading) * deltaTime
-    }
+    //   else if (right) {
+    //     this.turnClockwise(deltaTime)
+    //   }
+
+    //   sprite.x += this.speed * deltaTime
+
+    //   console.log(this.heading)
+    //   sprite.x += this.speed * math.cos(this.heading) * deltaTime
+    //   sprite.y += this.speed * math.sin(this.heading) * deltaTime
+    // }
   }
 
   sync (data) {
@@ -62,13 +78,13 @@ class Player {
   }
 
   turnAntiClockwise (deltaTime) {
-    // this.sprite.rotation -= this.turnSpeed * deltaTime
     this.heading -= this.turnSpeed * deltaTime
+    this.sprite.rotation = this.heading
   }
 
   turnClockwise (deltaTime) {
-    // this.sprite.rotation += this.turnSpeed * deltaTime
     this.heading += this.turnSpeed * deltaTime
+    this.sprite.rotation = this.heading
   }
 
   getPlayerInfo () {

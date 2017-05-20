@@ -23,6 +23,7 @@
     "eventemitter3": "^2.0.2",
     "keyboardjs": "^2.3.3",
     "math.js": "^1.1.28",
+    "matter-js": "^0.12.0",
     "pixi.js": "^4.3.4",
     "socket-io": "^1.0.0",
     "socket.io-client": "^2.0.1",
