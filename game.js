@@ -24,16 +24,32 @@ class Game {
       this.input('left')
     })
 
+    keyboardjs.bind('a', null, () => {
+      this.input('left-release')
+    })
+
     keyboardjs.bind('s', () => {
       this.input('down')
+    })
+
+    keyboardjs.bind('s', null, () => {
+      this.input('down-release')
     })
 
     keyboardjs.bind('d', () => {
       this.input('right')
     })
 
+    keyboardjs.bind('d', null, () => {
+      this.input('right-release')
+    })
+
     keyboardjs.bind('w', () => {
       this.input('up')
+    })
+
+    keyboardjs.bind('w', null, () => {
+      this.input('up-release')
     })
   }
 
@@ -47,6 +63,18 @@ class Game {
     window.requestAnimationFrame((time) => {
       this.loop(time)
     })
+
+    this.deltaTime = time - this.lastTime
+    this.lastTime = time
+    // console.log(`Delta time : ${this.deltaTime}`)
+    // console.log(`Last time : ${this.lastTime}`)
+    // console.log(`time : ${time}`)
+
+    if (this.deltaTime) {
+      for (var id in this.players) {
+        this.players[id].update(this.deltaTime)
+      }
+    }
 
     this.renderer.render(this.stage)
   }
