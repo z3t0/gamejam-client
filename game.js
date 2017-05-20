@@ -23,25 +23,22 @@ class Game {
       this.loop(time)
     })
 
-    this.deltaTime = time - this.lastTime
-    this.lastTime = time
+    // this.deltaTime = time - this.lastTime
+    // this.lastTime = time
 
-    if (time != null) {
-      for (var id in this.players) {
-        this.players[id].update(this.deltaTime)
-      }
+    // if (time != null) {
+    // }
 
-      this.renderer.render(this.stage)
-    }
+    console.log('loop')
   }
 
   emit(msg, data) {
-    this.me.
+    // this.me.
     this.client.socket.emit(msg, this.timeline.offset(0))
   }
 
   connect () {
-    this.client = require('./client.js')({path: '10.226.158.2:3000'}, this)
+    this.client = require('./client.js')({path: '10.227.130.122:3000'}, this)
 
     var client = this.client.emitter
 
@@ -52,21 +49,13 @@ class Game {
     })
 
     client.on('connect', (data) => {
-      this.timeline = timeframe.createTimeline()
       this.me = new Player(data, this)
       this.players[this.me.id] = this.me
       this.loop()
     })
 
     client.on('update', (data) => {
-      for (var i = 0; i < data.length; i++) {
-        try {
-          this.players[data[i].id].sync(data[i])
-        } catch (err) {
-          console.log(this.players)
-          console.log(data)
-        }
-      }
+
     })
   }
 
@@ -99,37 +88,6 @@ class Game {
     this.renderer = renderer
     this.stage = stage
     this.pixi = PIXI
-
-  // keyboard
-  // Capture the keyboard arrow keys
-    var left = keyboard(37)
-    var up = keyboard(38)
-    var right = keyboard(39)
-    var down = keyboard(40)
-
-    // Left arrow key `press` method
-    left.press = () => {
-      this.me.setVelocityX(-1)
-      this.emit('left')
-    }
-
-  // Up
-    up.press = () => {
-      this.me.setVelocityY(-1)
-      this.emit('up')
-    }
-
-  // Right
-    right.press = () => {
-      this.me.setVelocityX(1)
-      this.emit('right')
-    }
-
-  // Down
-    down.press = () => {
-      this.me.setVelocityY(1)
-      this.emit('down')
-    }
 
     this.connect()
   }
