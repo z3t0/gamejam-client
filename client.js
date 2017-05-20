@@ -19,10 +19,10 @@ function Client (opts) {
     emitter.emit('connect', playerData)
   })
 
-  socket.on('new_player', function (playerData) {
+  socket.on('newPlayer', function (playerData) {
     playerData.isMe = false
     console.log('new player')
-    emitter.emit('new_player', playerData)
+    emitter.emit('newPlayer', playerData)
   })
 
   socket.on('update', (data) => {

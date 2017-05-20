@@ -29,7 +29,6 @@ class Game {
     })
 
     keyboardjs.bind('d', () => {
-      console.log('d')
       this.input('right')
     })
 
@@ -61,7 +60,7 @@ class Game {
 
     var client = this.client.emitter
 
-    client.on('new_player', this.gotNewPlayer.bind(this))
+    client.on('newPlayer', this.gotNewPlayer.bind(this))
 
     client.on('connect', this.gotConnect.bind(this))
 
@@ -76,7 +75,7 @@ class Game {
   }
 
   gotNewPlayer (data) {
-    console.log('new player')
+    console.log(`newPlayer: ${data.id}`)
     var newPlayer = new Player(data, this)
     this.players[newPlayer.id] = newPlayer
   }
